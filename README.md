@@ -31,9 +31,9 @@ the folder org.sitemule.rpglanguage.rpgle . Now select  “run as“ and then �
 Now the fun begins: An new instance of Eclipse will spin up where you can
 try out the RPG syntax and it will give you:
 
-..* Syntax highlight
-..* Code completion
-..* Syntax checking 
++ Syntax highlight
++ Code completion
++ Syntax checking 
 
 ### This is a RPG free editor plugin for Eclipse!! 
 
