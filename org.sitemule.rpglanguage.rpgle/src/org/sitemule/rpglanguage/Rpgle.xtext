@@ -1,0 +1,232 @@
+/* ----------------------------------------------------------------------
+ * RPG Gramma.
+ * 
+ * Copyright (C) 2019 
+ * Niels Liisberg  - System & Method A/S - Sitemule
+ * ---------------------------------------------------------------------- */
+grammar org.sitemule.rpglanguage.Rpgle with org.eclipse.xtext.common.Terminals
+
+generate rpgle "http://www.sitemule.org/rpglanguage/Rpgle"
+
+Language:
+    (elements+=Components)*;
+  
+Components:
+	Ctrlopt  | Directive | Declare;
+
+  
+Ctrlopt:
+    'ctl-opt' (opt+=Opt)+ ';';
+
+Opt:
+	name=ID ('(' value=STRING ')')?;
+	
+Directive:
+    '/include' name=ID ';';
+    
+Declare:
+	Dclproc | Dcls | Dclf;	
+
+
+// ---------------------- files ------------------------
+Dclf:
+    'dcl-f' name=ID ';';
+    
+Fileio: 
+	Open|Close|Chain|Read|Reade|Setll|Setgt|Eof|Rnf;
+
+
+Open:
+	'open' name=[Dclf] ;
+	
+Close:
+	'close' name=[Dclf] ;
+
+Chain:
+	'chain' name=[Dclf];
+
+Read:
+	'read' name=[Dclf];
+
+Reade:
+	'reade' name=[Dclf];
+
+Setll:
+	'setll' name=[Dclf];
+
+Setgt:
+	'setgt' name=[Dclf];
+Eof:
+	'%eof' '(' name=[Dclf] ')';
+Rnf:
+	'%rnf' '(' name=[Dclf] ')';
+
+
+// Procedures:
+// ---------------------------------------------------
+	Dclproc:
+    'dcl-proc' name=ID ';'  (declare+=Declare)* (code+=Code)*   'end-proc;' ;
+	
+Code:
+	(Stmt | Subrutine) ';';
+
+// Subrutine
+// ---------------------------------------------------
+Subrutine:
+	'begsr' name=ID ';' (subrcode+=Code)*  'endsr';
+
+Exsr:
+	'exsr' name=[Subrutine];
+
+
+Stmt:
+	Assignment|Ifblock|Do|Dow|Dou|For|Selectblock|Exsr|Fileio|Return;
+
+/*	
+//	Or|If|Do|Dow|Dou|Select|Begsr|Endsr|Endif|Endsl|Enddo|Endfor|When|Exsr|Else|Elseif|Other;
+*/
+
+
+
+Assignment:
+   variable=[Dcls] '=' expression=Expression ;
+
+Expression: 
+	intval=INT | strval=STRING | var=[Dcls] | Bif | procval=[Dclproc] '(' (parmlist+=Parmlist)? ')';
+
+Bif:
+	Eof|Rnf;
+
+
+Parmlist:
+	Parm1 (parms+=Parm2)*;
+	
+Parm1:
+	parm=Expression;
+	
+Parm2:
+	':' Parm1;
+
+		
+// ------------------- IF --------------
+Ifblock:
+	If  (ifcode+=Elseif)* (ifcode+=Else)? Endif;
+
+If: 	 
+	'if' Boolean ';' 
+		(ifcode+=Code)*;
+
+Elseif:
+	'elseif' Boolean ';' 
+		(ifcode+=Code)*;
+
+Else:
+	{Else} 'else' ';'  
+		(ifcode+=Code)*;
+
+Endif:
+	'endif';
+
+// Do
+// ---------------------------------------------------
+	 
+Do:
+	'do' ';'
+		(code+=Code)*
+	'enddo' ';';	
+
+Dow:
+	'dow' dow=Boolean ';'
+		(code+=Code)*
+	'enddo' ';';
+		
+Dou:
+	'dou' dou=Boolean ';'
+		(code+=Code)*
+	'enddo' ';';
+	
+
+For:
+	'for' var=[Dcls] '=' from=Expression 'to' to=Expression ';'
+		(code+=Code)*
+	'endfor' ';';	
+
+// Select
+// ---------------------------------------------------
+Selectblock:
+	{Selectblock} Select ';'  (when=When)* (other=Other)? Endsl;
+
+Select:
+	'select' ';';
+
+When:
+	'when' Boolean ';' (whencode+=Code)*;
+
+Other:
+	{Other} 'other' ';' (othercode+=Code)*;
+
+Endsl:
+	'endsl';	
+		
+Return:
+	{Return} 'return' (expression+=Expression)?;
+	
+// Boolean expression:
+// ---------------------------------------------------------
+Boolean:
+	{Boolean} boolexprs+=BoolExpr*;
+
+BoolExpr:
+	('not')? OrExpr;
+
+OrExpr returns BoolExpr:
+	AndExpr ({Or.left=current} 'or' right=AndExpr)*;
+
+AndExpr returns BoolExpr:
+	PrimaryExpr ({And.left=current} 'and' right=PrimaryExpr)*;
+
+PrimaryExpr returns BoolExpr:
+	'(' BoolExpr ')' | Compare;
+	
+Compare:
+	(spec=Special | intval2=INT | strval2=STRING | var2=[Dcls] | bif2=Bif ) (cmp=Compare2)?;
+
+Compare2:
+	('>'|'<'|'='|'>='|'<=') CompareRight;
+
+CompareRight:
+	(spec=Special | intval2=INT | strval2=STRING | var2=[Dcls] | bif2=Bif ) (cmp=Compare2)?;
+	
+
+Special:
+	IND | '*INLR' | 'INH1' | '*ON' | '*OFF' | '*ZEROS' | '*ZERO' | '*BLANK' | '*BLANKS' | '*HIVAL' | '*LOVAL';
+	
+terminal IND:
+	'*IN' ('0'..'9') ('0'..'9');
+	
+/* TODO !!
+Bif:
+	
+	abs|addr|alloc|bitand|bitnot|bitor|bitxor|char|check|checkr|date|days|dec|dech|decpos|diff|div|editc|editflt|editw|elem|eof|equal|error|fields|float|found|graph|hours|int|inth|kds|len|lookup|minutes|months|mseconds|nullind|occur|open|paddr|paddr|parms|realloc|rem|replace|scan|seconds|shtdn|size|sqrt|status|str|str|str|subdt|this|time|timestamp|tlookup|trim|triml|trimr|ucs2|uns|unsh|xfoot|xlate|years)\b</string>
+			
+Opcode:			
+not|acq|add|adddur|alloc|and|bitoff|biton|cab|call|callb|callp|cas|cat|chain|check|checkr|clear|close|commit|comp|dealloc|define|delete|div|dsply|dump|eval|evalr|except|exfmt|exsr|extrct|feod|force|goto|in|iter|kfld|klist|leave|leavesr|lookup|mhhzo|mhlzo|mlhzo|mllzo|monitor|move|movea|movel|mult|mvr|next|occur|on|open|or|other|out|parm|plist|post|read|readc|reade|readp|readpe|realloc|rel|reset|reset|return|rolbk|scan|setgt|setll|setoff|seton|shtdn|sorta|sqrt|sub|subdur|subst|tag|test|testb|testn|testz|time|unlock|update|write|xfoot|xlate|z-add|z-sub)\b</string>
+			;
+
+*/
+
+Dcls:
+    'dcl-s' name=ID datatype=Datatype (options=Options)? ';';
+    
+Datatype:
+	('char' |'varchar'|'int'|'dec'|'date'|'timestamp') (len=Len)?;
+
+Len:
+	'(' INT ')';
+
+Options:
+	'options' '(' val=STRING ')';
+
+/* TODO!!    
+dcl-c|dcl-ds|end-ds|dcl-pi|end-pi|dcl-pr|end-p    
+*/    

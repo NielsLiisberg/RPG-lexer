@@ -1,0 +1,31 @@
+Manifest-Version: 1.0
+Automatic-Module-Name: org.sitemule.rpglanguage.rpgle
+Bundle-ManifestVersion: 2
+Bundle-Name: org.sitemule.rpglanguage.rpgle
+Bundle-Vendor: My Company
+Bundle-Version: 1.0.0.qualifier
+Bundle-SymbolicName: org.sitemule.rpglanguage.rpgle; singleton:=true
+Bundle-ActivationPolicy: lazy
+Require-Bundle: org.eclipse.xtext,
+ org.eclipse.xtext.xbase,
+ org.eclipse.equinox.common;bundle-version="3.5.0",
+ org.eclipse.emf.ecore,
+ org.eclipse.xtext.xbase.lib;bundle-version="2.14.0",
+ org.eclipse.xtext.util,
+ org.eclipse.emf.common,
+ org.eclipse.xtend.lib;bundle-version="2.14.0",
+ org.antlr.runtime;bundle-version="[3.2.0,3.2.1)"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Export-Package: org.sitemule.rpglanguage,
+ org.sitemule.rpglanguage.validation,
+ org.sitemule.rpglanguage.parser.antlr.internal,
+ org.sitemule.rpglanguage.services,
+ org.sitemule.rpglanguage.rpgle.util,
+ org.sitemule.rpglanguage.rpgle,
+ org.sitemule.rpglanguage.rpgle.impl,
+ org.sitemule.rpglanguage.generator,
+ org.sitemule.rpglanguage.serializer,
+ org.sitemule.rpglanguage.parser.antlr,
+ org.sitemule.rpglanguage.scoping,
+ org.sitemule.rpglanguage.parser.antlr.lexer
+Import-Package: org.apache.log4j
