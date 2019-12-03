@@ -6,8 +6,8 @@ it is now possible to use standard lexers like xText or event use tooling from t
 to parse RPG and even generate code. 
 So this project can be used as an academic project for better understanding of the RPG 
 language but also for better tooling like plug in for 100% free-RPG editors 
-running in i.e. Eclipse with code completion etc. Or even tranpilers to create C or JAVA code 
-from RPG. Just some thoughts
+running in i.e. Eclipse with code completion etc. Or even to build transpilers to create C, C# or JAVA code 
+from RPG .... Just some thoughts
 
 This implementation is using xText to describe the RPG language as a domain specific language in JAVA.
 
